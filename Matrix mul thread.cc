@@ -75,7 +75,14 @@ void matrixmul(){
     }
     clock_t end_time=clock();
     printf("Time taken is: %f seconds\n",(double)(end_time-start_time)/CLOCKS_PER_SEC);
-}
+    for(int i=0;i<row1;i++)
+    {
+        for(int j=0;j<col2;j++)
+        {
+            printf("%d ",result[i][j]);
+        }
+        printf("\n");
+    }}
 void free_matrices() {
     for (int i = 0; i < row1; i++) free(matrix1[i]);
     for (int i = 0; i < row2; i++) free(matrix2[i]);
