@@ -43,19 +43,33 @@ void read(const char* filename){
     }
 
 }
-void *element(void *elements)
+void *compute(void *elements)
 {
     index *element_index=(index*)elements;
-    int sum=0;
-    for(int k=0;k<col1;k++)
+    int r=element_index->row;
+    int c=element_index->col;
+    if(c!=-1)
     {
-        sum+=matrix1[element_index->row][k]*matrix2[k][element_index->col];
+        int sum=0;
+        for(int k=0;k<col1;k++)
+    {
+            sum+=matrix1[element_index->row][k]*matrix2[k][element_index->col];
     }
-    result[element_index->row][element_index->col]=sum;
+        result[element_index->row][element_index->col]=sum;
+    }else{  
+        for (int j = 0; j < col2; j++) {
+            int sum = 0;
+            for (int k = 0; k < col1; k++) {
+                sum += matrix1[r][k] * matrix2[k][j];
+            }
+            result[r][j] = sum;
+        }
+    }
+    
     free(elements);
     return NULL;
 }
-void matrixmul(){
+double matrixmul_element(){
     pthread_t threads[row1*col2];
     int counter=0;
     clock_t start_time=clock();
@@ -66,7 +80,7 @@ void matrixmul(){
             index *indexx=(index*)malloc(sizeof(index));
             indexx->row=i;
             indexx->col=j;
-            pthread_create(&threads[counter++],NULL,element,indexx);
+            pthread_create(&threads[counter++],NULL,compute,indexx);
         }
     }
     for(int i=0;i<counter;i++)
@@ -74,15 +88,44 @@ void matrixmul(){
         pthread_join(threads[i],NULL);
     }
     clock_t end_time=clock();
-    printf("Time taken is: %f seconds\n",(double)(end_time-start_time)/CLOCKS_PER_SEC);
-    for(int i=0;i<row1;i++)
+    printf("element result:");
+     for(int i=0;i<row1;i++)
     {
         for(int j=0;j<col2;j++)
         {
             printf("%d ",result[i][j]);
         }
         printf("\n");
-    }}
+    }
+    return (double)(end_time-start_time)/CLOCKS_PER_SEC;
+    }
+double matrixmul_row()
+{
+    pthread_t threads[row1];
+    clock_t start_time=clock();
+    for(int i=0;i<row1;i++)
+    {
+        index *indexx=(index*)malloc(sizeof(index));
+        indexx->row=i;
+        indexx->col=-1;
+        pthread_create(&threads[i],NULL,compute,indexx);
+    }
+    for(int i=0;i<row1;i++)
+    {
+        pthread_join(threads[i],NULL);
+    }
+    clock_t end_time=clock();
+    printf("row result:");
+     for(int i=0;i<row1;i++)
+    {
+        for(int j=0;j<col2;j++)
+        {
+            printf("%d ",result[i][j]);
+        }
+        printf("\n");
+    }
+    return (double)(end_time - start_time)/CLOCKS_PER_SEC;
+}
 void free_matrices() {
     for (int i = 0; i < row1; i++) free(matrix1[i]);
     for (int i = 0; i < row2; i++) free(matrix2[i]);
@@ -101,7 +144,13 @@ int main()
         return 1;
 
     }
-    matrixmul();
+    printf("Element wise multiplication:\n");
+    double t1=matrixmul_element();
+    printf("elapsed time for procedure 1 %f",t1);
+    printf("\nrow wise multiplication");
+    double t2=matrixmul_row();
+    printf("\nelapsed time for procedure 2 %f",t2);
+
     free_matrices();
     return 0;
 }
