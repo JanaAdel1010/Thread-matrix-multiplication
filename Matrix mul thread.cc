@@ -88,7 +88,8 @@ double matrixmul_element(){
         pthread_join(threads[i],NULL);
     }
     clock_t end_time=clock();
-    printf("element result:");
+    printf("element result:\n");
+    printf("[result matrix entries]\n");
      for(int i=0;i<row1;i++)
     {
         for(int j=0;j<col2;j++)
@@ -115,7 +116,8 @@ double matrixmul_row()
         pthread_join(threads[i],NULL);
     }
     clock_t end_time=clock();
-    printf("row result:");
+    printf("row result:\n");
+    printf("[result matrix entries]\n");
      for(int i=0;i<row1;i++)
     {
         for(int j=0;j<col2;j++)
@@ -147,9 +149,9 @@ int main()
     printf("Element wise multiplication:\n");
     double t1=matrixmul_element();
     printf("elapsed time for procedure 1 %f",t1);
-    printf("\nrow wise multiplication");
+    printf("\nrow wise multiplication\n");
     double t2=matrixmul_row();
-    printf("\nelapsed time for procedure 2 %f",t2);
+    printf("elapsed time for procedure 2 %f",t2);
 
     free_matrices();
     return 0;
